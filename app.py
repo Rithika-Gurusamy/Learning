@@ -1,3 +1,5 @@
+import json
+import os
 def add_student():
     try:
         r = int(input("\nEnter roll number: "))
@@ -16,8 +18,9 @@ def add_student():
             "math": math,
             "phy" :  phy,
             "che" : che }
-        
+        json_dump()
         print("Student details added successfully")
+
     except:
         print("Enter valid details")
 def view_student():
@@ -42,6 +45,7 @@ def search_student():
             print("Student marks")
         for k,v in marks[n].items():
             print(k,":",v)
+        
     except:
         print("Enter valid roll number")
 def delete_student():
@@ -49,9 +53,12 @@ def delete_student():
         n = int(input("\nEnter roll number: "))
         if n in students.keys():
             del students[n]
+            del marks[n]
+            json_dump()
             print("Deleted successfully")
         else:
             print("Student roll number does not exist")
+        
     except:
         print("Enter valid roll number ") 
 def update_student():
@@ -85,6 +92,7 @@ def update_student():
                 print("Enter valid marks")
             marks[n][sub] = val
             print("Marks update successfully")
+        json_dump()
             
     except:
         print("Enter valid roll number")
@@ -105,9 +113,44 @@ def status():
     elif sum >= 250 and sum <= 300:
         print("Best")
 
-students = {}
-marks = {}
+'''def json_load():
+    if os.path.exists("students.josn"):
+      with open("students.json","r") as file:
+        data = json.load(file)
+        return data
+    return {}
+def json_dump():
+    with open("students.json","r") as file:
+        data = {
+            "students" : students,
+            "marks" : marks
+        }
+        json.dump(data,file)
 
+data = json_load()
+students = data[students]
+marks = data[marks]
+'''
+def json_load():
+    if os.path.exists("students.json"):
+        with open("students.json", "r") as file:
+            data = json.load(file)
+            return data
+    return {"students": {}, "marks": {}}
+
+
+def json_dump():
+    data = {
+        "students": students,
+        "marks": marks
+    }
+    with open("students.json", "w") as file:
+        json.dump(data, file)
+
+
+data = json_load()
+students = data["students"]
+marks = data["marks"]
 while True:
     try :
         n = int(input("\nEnter your choice : "))
