@@ -9,6 +9,64 @@ class Student(BaseModel):
     email : str 
     age : int 
 
+class Updateemail(BaseModel):
+    roll : int
+    email : str 
+
+@app.get("/students")
+def get_students():
+    return students 
+
+@app.get("/student/{roll}")
+def get_onestudent(roll : int):
+    for student in students:
+        if student.roll == roll:
+            return student
+    return {
+    "message": "Student not found"
+}
+
+@app.post("/student")
+def create_student(student : Student):
+    for s in students:
+        if s.roll == student.roll:
+            return {
+                "message": "Roll number already exists"}
+
+    students.append(student)
+    return {
+    "message": "Student created successfully"},student
+    
+
+
+        
+@app.delete("/student/{roll}")
+def delete_student(roll : int):
+    for student in students:
+        if student.roll == roll:
+            students.remove(student)
+            return {
+    "message": "Student deleted successfully"
+}
+    return{"message": "Student not found"
+    }
+
+@app.put("/emailupdate")
+def updateemail(value : Updateemail):
+    for s in students:
+        if s.roll == value.roll:
+            s.email = value.email
+            return {
+                "message" : "Student email updated successfully"
+            }
+
+@app.get("/students/count")
+def countstudents():
+    return len(students)
+
+'''
+
+
 @app.post("/student") 
 def get_student(student : Student): 
     students.append(student) 
@@ -18,51 +76,8 @@ def get_student(student : Student):
         "email" : student.email, 
         "age" : student.age }
 
-@app.get("/students")
-def get_students(students):
-    display_content = ""
-    for student in students:
 
-        display_content += student.name + \n 
-        display_content += stduent.roll + \n
-        display_content += student.email+\n
-        display_content += student.age+\n
 
-        
-    return display_content 
-
-@app.get("/student/{roll}")
-def get_onestudent(roll : int):
-    for student in students:
-        if student.roll == roll:
-            return student
-        
-@app.put("/strudent/{roll}")
-def update_student(roll : int):
-    n = int(input("Enter your field"))
-    for student in students:
-        if student.roll == roll:
-            if n == 1:
-                name = input("enter name")
-                student.name = name
-            elif n == 2:
-                x = int(input("enter roll number"))
-                student.roll = x
-            elif n == 3:
-                email = input("Enter email")
-                student.email = email 
-            elif n == 4:
-                age = int(input("Enter correct age"))
-                student.age = age
-    return "Updated successfully"
-
-@app.delete("/student/{roll}")
-def delete_student(roll : int):
-    for student in students:
-        if student.roll == roll:
-            students.pop(student)
-            return "student deleted succesfully"
-'''
 @app.get("/students/{roll}")
 def getroll(roll : int):
     return {
