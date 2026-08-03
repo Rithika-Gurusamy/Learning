@@ -11,7 +11,15 @@ class Student(BaseModel):
 
 class Updateemail(BaseModel):
     roll : int
-    email : str 
+    email : str
+
+class UpdateAge:
+    roll : int
+    age : int
+
+class   UpdateName:
+    roll : int
+    name : str
 
 @app.get("/students")
 def get_students():
@@ -62,7 +70,121 @@ def updateemail(value : Updateemail):
 
 @app.get("/students/count")
 def countstudents():
-    return len(students)
+    return {
+        "total_students" : len(students)
+    }
+
+@app.get("/student/email/{email}")
+def get_student_by_email(email : str):
+    for s in students:
+        if s.email == email:
+            return s
+    return {
+    "message": "Student not found"
+}
+
+@app.delete("/students")
+def deletall():
+    students.clear()
+    return {
+    "message": "All students deleted"
+}
+
+
+
+@app.get("/students/sorted")
+def display():
+    sorted_arr = sorted(students,key = lambda st: st.roll)
+    return sorted_arr
+
+@app.get(" /students/older-than/{age}")
+def func(age : int):
+    arr = []
+    for st in students:
+        if st.age > age:
+            arr.append(st)
+    return arr
+
+@app.get(" /students/name/{name}")
+def func(name : str):
+    arr = []
+    for st in students:
+        if st.name == name:
+            arr.append(st)
+    return arr
+
+@app.patch("/student/age")
+def func(up : UpdateAge):
+    for st in students:
+        if st.roll == up.roll:
+            st.age = up.age
+            return {
+                "message" : "age updated"
+            }
+    return {
+        "message" : "student not found"
+    }
+
+@app.patch("/student/name")
+def func(up : UpdateName):
+    for st in students:
+        if st.roll == up.roll:
+            st.name = up.name
+            return {
+                "message" : "name updated"
+            }
+    return {
+        "message" : "student not found"
+    }
+
+@app.get("/students/top-oldest")
+def get_oldest():
+    arr = sorted(students , key = lambda s:s.age)
+    return arr[-1]
+
+@app.get("/students/average-age")
+def func():
+    arr = [st.age for st in students]
+    avg = sum(arr)//len(arr)
+    return avg
+
+@app.get("/students/search")
+def func(name : str):
+    arr = [st for st in students if st.name.lower == name.lower()]
+    return arr
+
+
+@app.delete("/student/{email}")
+def get_student_by_email(email : str):
+    for student in students:
+        if student.email == email:
+            students.remove[student]
+            return {"message":"student deleted"}
+    return {
+        "message" : "Student not found"
+    } 
+
+@app.put("/student")
+def fun(st : Student):
+    for s in students:
+        if s.roll == st.roll:
+            s = st
+            return {
+                "message" : "student record updated successfully"
+
+            }
+
+@app.get("/students/rolls")
+def fun():
+    arr = [st.roll for st in students]
+    arr.sort()
+    return arr
+
+@app.get("/students/emails")
+def fun():
+    arr = [st.email for st in students]
+    return arr
+
 
 '''
 

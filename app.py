@@ -152,7 +152,7 @@ data = json_load()
 students = data["students"]
 marks = data["marks"]
 while True:
-    try :
+    try:
         n = int(input("\nEnter your choice : "))
         if n == 1:
             add_student()
@@ -168,8 +168,8 @@ while True:
             status()
         else:
             break
-
     except:
+    
         print("Enter valid number ")
 
 
