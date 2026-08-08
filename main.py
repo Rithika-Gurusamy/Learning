@@ -13,11 +13,11 @@ class Updateemail(BaseModel):
     roll : int
     email : str
 
-class UpdateAge:
+class UpdateAge(BaseModel):
     roll : int
     age : int
 
-class   UpdateName:
+class   UpdateName(BaseModel):
     roll : int
     name : str
 
@@ -43,12 +43,13 @@ def create_student(student : Student):
 
     students.append(student)
     return {
-    "message": "Student created successfully"},student
-    
+    "message": "Student created successfully",
+    "student": student
+    }    
 
 
         
-@app.delete("/student/{roll}")
+@app.delete("/student/roll/{roll}")
 def delete_student(roll : int):
     for student in students:
         if student.roll == roll:
@@ -67,6 +68,9 @@ def updateemail(value : Updateemail):
             return {
                 "message" : "Student email updated successfully"
             }
+    return {
+    "message": "Student not found"
+}
 
 @app.get("/students/count")
 def countstudents():
@@ -97,7 +101,7 @@ def display():
     sorted_arr = sorted(students,key = lambda st: st.roll)
     return sorted_arr
 
-@app.get(" /students/older-than/{age}")
+@app.get("/students/older-than/{age}")
 def func(age : int):
     arr = []
     for st in students:
@@ -105,7 +109,7 @@ def func(age : int):
             arr.append(st)
     return arr
 
-@app.get(" /students/name/{name}")
+@app.get("/students/name/{name}")
 def func(name : str):
     arr = []
     for st in students:
@@ -140,25 +144,29 @@ def func(up : UpdateName):
 @app.get("/students/top-oldest")
 def get_oldest():
     arr = sorted(students , key = lambda s:s.age)
-    return arr[-1]
+    if len(arr)> 0:
+        return arr[-1]
+    return {"message" : "No students are available"}
 
 @app.get("/students/average-age")
 def func():
     arr = [st.age for st in students]
-    avg = sum(arr)//len(arr)
-    return avg
+    if len(arr) > 0 :
+        avg = sum(arr)//len(arr)
+        return avg
+    return {"message" : "No students are available"}
 
 @app.get("/students/search")
 def func(name : str):
-    arr = [st for st in students if st.name.lower == name.lower()]
+    arr = [st for st in students if st.name.lower() == name.lower()]
     return arr
 
 
-@app.delete("/student/{email}")
+@app.delete("/student/email/{email}")
 def get_student_by_email(email : str):
     for student in students:
         if student.email == email:
-            students.remove[student]
+            students.remove(student)
             return {"message":"student deleted"}
     return {
         "message" : "Student not found"
@@ -166,9 +174,9 @@ def get_student_by_email(email : str):
 
 @app.put("/student")
 def fun(st : Student):
-    for s in students:
-        if s.roll == st.roll:
-            s = st
+    for i in range(len(students)):
+        if students[i].roll == st.roll:
+            students[i] = st
             return {
                 "message" : "student record updated successfully"
 
