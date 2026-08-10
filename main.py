@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 app = FastAPI()
 
@@ -30,16 +30,13 @@ def get_onestudent(roll : int):
     for student in students:
         if student.roll == roll:
             return student
-    return {
-    "message": "Student not found"
-}
+    raise HTTPException(status_code = 404 , detail = "Student not found")
 
 @app.post("/student")
 def create_student(student : Student):
     for s in students:
         if s.roll == student.roll:
-            return {
-                "message": "Roll number already exists"}
+            raise HTTPException(status_code=400 , detail = "Student already exists")
 
     students.append(student)
     return {
@@ -55,10 +52,8 @@ def delete_student(roll : int):
         if student.roll == roll:
             students.remove(student)
             return {
-    "message": "Student deleted successfully"
-}
-    return{"message": "Student not found"
-    }
+    "message": "Student deleted successfully"}
+    raise HTTPException(status_code = 404 , detail="Student not found")
 
 @app.put("/emailupdate")
 def updateemail(value : Updateemail):
@@ -68,9 +63,7 @@ def updateemail(value : Updateemail):
             return {
                 "message" : "Student email updated successfully"
             }
-    return {
-    "message": "Student not found"
-}
+    raise HTTPException(status_code= 404 , detail="student not found")
 
 @app.get("/students/count")
 def countstudents():
@@ -82,10 +75,8 @@ def countstudents():
 def get_student_by_email(email : str):
     for s in students:
         if s.email == email:
-            return s
-    return {
-    "message": "Student not found"
-}
+          return s
+    raise HTTPException(status_code= 404 , detail="student not found")
 
 @app.delete("/students")
 def deletall():
@@ -125,10 +116,7 @@ def func(up : UpdateAge):
             return {
                 "message" : "age updated"
             }
-    return {
-        "message" : "student not found"
-    }
-
+    raise HTTPException(status_code= 404 , detail="student not found")
 @app.patch("/student/name")
 def func(up : UpdateName):
     for st in students:
@@ -137,9 +125,7 @@ def func(up : UpdateName):
             return {
                 "message" : "name updated"
             }
-    return {
-        "message" : "student not found"
-    }
+    raise HTTPException(status_code= 404 , detail="student not found")
 
 @app.get("/students/top-oldest")
 def get_oldest():
@@ -168,9 +154,7 @@ def get_student_by_email(email : str):
         if student.email == email:
             students.remove(student)
             return {"message":"student deleted"}
-    return {
-        "message" : "Student not found"
-    } 
+    raise HTTPException(status_code= 404 , detail="student not found") 
 
 @app.put("/student")
 def fun(st : Student):
