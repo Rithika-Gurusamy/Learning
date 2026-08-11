@@ -2,12 +2,22 @@ from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 app = FastAPI()
 
-students = [] 
+students = []
+class studentresponse(BaseModel):
+    name : str
+    roll : int 
 class Student(BaseModel): 
     name : str
     roll : int
     email : str 
     age : int 
+
+
+class StudentUpdate(BaseModel):
+    name : str | None = None
+    age : int | None = None
+    email : str | None = None
+
 
 class Updateemail(BaseModel):
     roll : int
@@ -21,12 +31,27 @@ class   UpdateName(BaseModel):
     roll : int
     name : str
 
+@app.patch("/update/{roll}")
+def updatestudent(roll : int , updates : StudentUpdate):
+    for student in students:
+        if student.roll == roll:
+            updated_data = updates.model_dump(exclude_unset = True)
+            for key,value in updated_data.items():
+                     setattr(student,key,value)
+            return {
+                "message" : "student update successfully",
+                "student" : student
+                                        }
+                    
+        
+        raise HTTPException(status_code =404 , detail = "Student not found")
+
 @app.get("/students")
 def get_students():
     return students 
 
 @app.get("/student/{roll}")
-def get_onestudent(roll : int):
+def get_onestudent(roll : int ):
     for student in students:
         if student.roll == roll:
             return student
@@ -55,15 +80,7 @@ def delete_student(roll : int):
     "message": "Student deleted successfully"}
     raise HTTPException(status_code = 404 , detail="Student not found")
 
-@app.put("/emailupdate")
-def updateemail(value : Updateemail):
-    for s in students:
-        if s.roll == value.roll:
-            s.email = value.email
-            return {
-                "message" : "Student email updated successfully"
-            }
-    raise HTTPException(status_code= 404 , detail="student not found")
+
 
 @app.get("/students/count")
 def countstudents():
@@ -107,7 +124,15 @@ def func(name : str):
         if st.name == name:
             arr.append(st)
     return arr
-
+@app.put("/updateemail")
+def updateemail(value : Updateemail):
+    for s in students:
+        if s.roll == value.roll:
+            s.email = value.email
+            return {
+                "message" : "Student email updated successfully"
+            }
+    raise HTTPException(status_code= 404 , detail="student not found")
 @app.patch("/student/age")
 def func(up : UpdateAge):
     for st in students:
