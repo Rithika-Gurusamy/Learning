@@ -1,4 +1,21 @@
-import json
+from fastapi import FastAPI , HTTPException
+from pydantic import BaseModel
+
+
+app = FastAPI()
+
+class Student(BaseModel):
+    name: str
+    roll: int
+    email: str
+    age: int
+
+class StudentUpdate(BaseModel):
+    name: str | None = None
+    age: int | None = None
+    email: str | None = None
+
+"""import json
 import os
 def add_student():
     try:
@@ -174,4 +191,4 @@ while True:
 
 
    
-
+"""
