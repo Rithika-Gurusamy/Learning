@@ -1,12 +1,15 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
+from database import SessionLocal
+from models import students 
+
 app = FastAPI()
 
 students = []
 class studentresponse(BaseModel):
     name : str
     roll : int 
-class Student(BaseModel): 
+class StudentCreate(BaseModel): 
     name : str
     roll : int
     email : str 
@@ -30,6 +33,27 @@ class UpdateAge(BaseModel):
 class   UpdateName(BaseModel):
     roll : int
     name : str
+
+@app.post("/student")
+def create_student(student: StudentCreate):
+
+    with SessionLocal() as session:
+
+        db_student = Student(
+            name=student.name,
+            roll=student.roll,
+            email=student.email,
+            age=student.age
+        )
+
+        session.add(db_student)
+
+        session.commit()
+
+        return {
+            "message": "Student created successfully"
+        }
+
 
 @app.patch("/update/{roll}")
 def updatestudent(roll : int , updates : StudentUpdate):

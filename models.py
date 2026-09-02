@@ -5,11 +5,9 @@ class Base(DeclarativeBase):
 
 class Student(Base):
     __tablename__ = "students"
-    name : Mapped[str] = mapped_column()
-    email : Mapped[str] = mapped_column()
-    age : Mapped[int] = mapped_column()
-    id : Mapped[int] = mapped_column(primary_key=True)
 
-
-
-
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column()
+    roll: Mapped[int] = mapped_column()
+    email: Mapped[str] = mapped_column()
+    age: Mapped[int] = mapped_column()
