@@ -1,20 +1,20 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
 from database import SessionLocal
-from models import students 
+from models import Student
+from sqlalchemy import select
+
 
 app = FastAPI()
 
-students = []
-class studentresponse(BaseModel):
-    name : str
-    roll : int 
+
+
+
 class StudentCreate(BaseModel): 
     name : str
     roll : int
     email : str 
     age : int 
-
 
 class StudentUpdate(BaseModel):
     name : str | None = None
@@ -22,17 +22,7 @@ class StudentUpdate(BaseModel):
     email : str | None = None
 
 
-class Updateemail(BaseModel):
-    roll : int
-    email : str
 
-class UpdateAge(BaseModel):
-    roll : int
-    age : int
-
-class   UpdateName(BaseModel):
-    roll : int
-    name : str
 
 @app.post("/student")
 def create_student(student: StudentCreate):
@@ -54,7 +44,88 @@ def create_student(student: StudentCreate):
             "message": "Student created successfully"
         }
 
+@app.get("/students")
+def get_students():
 
+    with SessionLocal() as session:
+
+        stmt = select(Student)
+
+        result = session.execute(stmt)
+
+        students = result.scalars().all()
+
+        return students
+
+@app.get("/students/{roll}")
+def get_student_by_roll(roll : int):
+
+    with SessionLocal() as session:
+
+        stmt = select(Student).where(Student.roll == roll)
+
+        result = session.execute(stmt)
+
+        st = result.scalar_one_or_none()
+        if st == None:
+            raise HTTPException(status_code=404 , detail = "student not found")
+        return st
+@app.get("/students/email/{email}")
+def get_student_by_email(email : str):
+    with SessionLocal() as session:
+        stmt = select(Student).where(Student.email == email)
+        result = session.execute(stmt)
+        st = result.scalars().all()
+        if len(st) > 0:
+            return st
+        else:
+            raise HTTPException(status_code=404 , detail = "student not found")
+
+@app.patch("student/update/{roll}")
+def updatestudent(roll : int ,st : StudentUpdate ):
+    with SessionLocal() as session:
+        stmt = select(Student).where(Student.roll == roll)
+        res = session.execute(stmt)
+        s = res.scalar_one_or_none()
+        if s == None:
+            raise HTTPException(status_code = 404 , detail = "student not found")
+        else:
+            updatedata = st.model_dump(exclude_unset = True)
+            for key,value in updatedata.items():
+                setattr(s,key,value)
+            session.commit()
+            return {
+                "message" : "student updated",
+                "student" : s}
+
+       
+'''
+students = []
+class studentresponse(BaseModel):
+    name : str
+    roll : int 
+
+class StudentUpdate(BaseModel):
+    name : str | None = None
+    age : int | None = None
+    email : str | None = None
+
+
+class Updateemail(BaseModel):
+    roll : int
+    email : str
+{
+                
+class UpdateAge(BaseModel):
+    roll : int
+    age : int
+
+class   UpdateName(BaseModel):
+    roll : int
+    name : str
+
+'''
+'''
 @app.patch("/update/{roll}")
 def updatestudent(roll : int , updates : StudentUpdate):
     for student in students:
@@ -225,7 +296,7 @@ def fun():
 def fun():
     arr = [st.email for st in students]
     return arr
-
+'''
 
 '''
 
