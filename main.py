@@ -21,7 +21,15 @@ class StudentUpdate(BaseModel):
     age : int | None = None
     email : str | None = None
 
+class Studentresponse(BaseModel):
+    name : str
+    roll : int
+    email : str
+    age : int
 
+    model_config = {
+        "from_attributes" : True
+    }
 
 
 @app.post("/student")
@@ -81,7 +89,7 @@ def get_student_by_email(email : str):
         else:
             raise HTTPException(status_code=404 , detail = "student not found")
 
-@app.patch("student/update/{roll}")
+@app.patch("/student/update/{roll}",response_model = Studentresponse)
 def updatestudent(roll : int ,st : StudentUpdate ):
     with SessionLocal() as session:
         stmt = select(Student).where(Student.roll == roll)
@@ -94,10 +102,7 @@ def updatestudent(roll : int ,st : StudentUpdate ):
             for key,value in updatedata.items():
                 setattr(s,key,value)
             session.commit()
-            return {
-                "message" : "student updated",
-                "student" : s}
-
+            return s 
        
 '''
 students = []
