@@ -1,35 +1,15 @@
 from fastapi import FastAPI,HTTPException,Depends
-from pydantic import BaseModel
 from database import SessionLocal,get_db
 from models import Student
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from schemas.student import StudentCreate , StudentUpdate , Studentresponse
 
 app = FastAPI()
 
 
 
 
-class StudentCreate(BaseModel): 
-    name : str
-    roll : int
-    email : str 
-    age : int 
-
-class StudentUpdate(BaseModel):
-    name : str | None = None
-    age : int | None = None
-    email : str | None = None
-
-class Studentresponse(BaseModel):
-    name : str
-    roll : int
-    email : str
-    age : int
-
-    model_config = {
-        "from_attributes" : True
-    }
 
 
 @app.post("/student")
