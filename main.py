@@ -102,8 +102,20 @@ def updatestudent(roll : int ,st : StudentUpdate ):
             for key,value in updatedata.items():
                 setattr(s,key,value)
             session.commit()
+            session.refresh(s)
             return s 
-       
+@app.delete("/student/delete/{roll}")
+def student_delete(roll : int):
+    with SessionLocal() as session:
+        stmt = select(Student).where(Student.roll == roll)
+        res = session.execute(stmt)
+        s = res.scalar_one_or_none()
+        if s == None:
+            raise HTTPException(status_code=404 , detail = "student not found")
+        else:
+            session.delete(s)
+            session.commit()
+            return {"message" : "Student deleted successfully"}
 '''
 students = []
 class studentresponse(BaseModel):
