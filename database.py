@@ -10,3 +10,7 @@ with engine.connect() as connection:
 Base.metadata.create_all(engine)
 
 SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+   with SessionLocal() as session:
+      yield session

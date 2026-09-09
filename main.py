@@ -1,9 +1,9 @@
-from fastapi import FastAPI,HTTPException
+from fastapi import FastAPI,HTTPException,Depends
 from pydantic import BaseModel
-from database import SessionLocal
+from database import SessionLocal,get_db
 from models import Student
 from sqlalchemy import select
-
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -33,10 +33,9 @@ class Studentresponse(BaseModel):
 
 
 @app.post("/student")
-def create_student(student: StudentCreate):
+def create_student(student: StudentCreate,db:Session = Depends(get_db)):
 
-    with SessionLocal() as session:
-
+    
         db_student = Student(
             name=student.name,
             roll=student.roll,
@@ -44,45 +43,43 @@ def create_student(student: StudentCreate):
             age=student.age
         )
 
-        session.add(db_student)
+        db.add(db_student)
 
-        session.commit()
+        db.commit()
 
         return {
             "message": "Student created successfully"
         }
 
 @app.get("/students")
-def get_students():
+def get_students(db:Session = Depends(get_db)):
 
-    with SessionLocal() as session:
-
+    
         stmt = select(Student)
 
-        result = session.execute(stmt)
+        result = db.execute(stmt)
 
         students = result.scalars().all()
 
         return students
 
 @app.get("/students/{roll}")
-def get_student_by_roll(roll : int):
-
-    with SessionLocal() as session:
+def get_student_by_roll(roll : int,db:Session = Depends(get_db)):
 
         stmt = select(Student).where(Student.roll == roll)
 
-        result = session.execute(stmt)
+        result = db.execute(stmt)
 
         st = result.scalar_one_or_none()
         if st == None:
             raise HTTPException(status_code=404 , detail = "student not found")
         return st
+
 @app.get("/students/email/{email}")
-def get_student_by_email(email : str):
-    with SessionLocal() as session:
+def get_student_by_email(email : str,db:Session = Depends(get_db)):
+    
         stmt = select(Student).where(Student.email == email)
-        result = session.execute(stmt)
+        result = db.execute(stmt)
         st = result.scalars().all()
         if len(st) > 0:
             return st
@@ -90,10 +87,10 @@ def get_student_by_email(email : str):
             raise HTTPException(status_code=404 , detail = "student not found")
 
 @app.patch("/student/update/{roll}",response_model = Studentresponse)
-def updatestudent(roll : int ,st : StudentUpdate ):
-    with SessionLocal() as session:
+def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db)):
+        
         stmt = select(Student).where(Student.roll == roll)
-        res = session.execute(stmt)
+        res = db.execute(stmt)
         s = res.scalar_one_or_none()
         if s == None:
             raise HTTPException(status_code = 404 , detail = "student not found")
@@ -101,20 +98,19 @@ def updatestudent(roll : int ,st : StudentUpdate ):
             updatedata = st.model_dump(exclude_unset = True)
             for key,value in updatedata.items():
                 setattr(s,key,value)
-            session.commit()
-            session.refresh(s)
+            db.commit()
+            db.refresh(s)
             return s 
 @app.delete("/student/delete/{roll}")
-def student_delete(roll : int):
-    with SessionLocal() as session:
+def student_delete(roll : int , db:Session = Depends(get_db)):
         stmt = select(Student).where(Student.roll == roll)
-        res = session.execute(stmt)
+        res = db.execute(stmt)
         s = res.scalar_one_or_none()
         if s == None:
             raise HTTPException(status_code=404 , detail = "student not found")
         else:
-            session.delete(s)
-            session.commit()
+            db.delete(s)
+            db.commit()
             return {"message" : "Student deleted successfully"}
 '''
 students = []
