@@ -4,12 +4,14 @@ from models import Student
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from schemas.student import StudentCreate , StudentUpdate , Studentresponse
+student_router = APIRouter(
+    prefix="/students",
+    tags=["Students"]
+)
 
-student_router = APIRouter()
 
 
-
-@student_router.post("/student")
+@student_router.post("")
 def create_student(student: StudentCreate,db:Session = Depends(get_db)):
 
     
@@ -28,7 +30,7 @@ def create_student(student: StudentCreate,db:Session = Depends(get_db)):
             "message": "Student created successfully"
         }
 
-@student_router.get("/students")
+@student_router.get("")
 def get_students(db:Session = Depends(get_db)):
 
     
@@ -40,7 +42,7 @@ def get_students(db:Session = Depends(get_db)):
 
         return students
 
-@student_router.get("/students/{roll}")
+@student_router.get("/{roll}")
 def get_student_by_roll(roll : int,db:Session = Depends(get_db)):
 
         stmt = select(Student).where(Student.roll == roll)
@@ -52,7 +54,7 @@ def get_student_by_roll(roll : int,db:Session = Depends(get_db)):
             raise HTTPException(status_code=404 , detail = "student not found")
         return st
 
-@student_router.get("/students/email/{email}")
+@student_router.get("/email/{email}")
 def get_student_by_email(email : str,db:Session = Depends(get_db)):
     
         stmt = select(Student).where(Student.email == email)
@@ -63,7 +65,7 @@ def get_student_by_email(email : str,db:Session = Depends(get_db)):
         else:
             raise HTTPException(status_code=404 , detail = "student not found")
 
-@student_router.patch("/student/update/{roll}",response_model = Studentresponse)
+@student_router.patch("/{roll}",response_model = Studentresponse)
 def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db)):
         
         stmt = select(Student).where(Student.roll == roll)
@@ -78,7 +80,7 @@ def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db)):
             db.commit()
             db.refresh(s)
             return s 
-@student_router.delete("/student/delete/{roll}")
+@student_router.delete("/{roll}")
 def student_delete(roll : int , db:Session = Depends(get_db)):
         stmt = select(Student).where(Student.roll == roll)
         res = db.execute(stmt)
