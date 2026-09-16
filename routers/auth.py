@@ -4,7 +4,7 @@ from database import get_db
 from sqlalchemy import select
 from schemas.user import UserCreate
 from sqlalchemy.orm import Session
-from security import hash_password,verify_password
+from security import hash_password,verify_password,create_access_token
 
 
 auth_router = APIRouter(
@@ -41,8 +41,13 @@ def user_login(user:UserCreate,db:Session = Depends(get_db)):
         raise HTTPException(status_code =404 , detail = "user not found")
     else:
         if verify_password(user.password,us.hashed_password):
+            access_token = create_access_token({
+                "sub" : us.id 
+            })
+
             return {
-                "message" : "user logged in successfully"
+                "message" : "user logged in successfully",
+                "access_token" : access_token
             }
         else:
             raise HTTPException(status_code = 401 , detail = "invalid password")
