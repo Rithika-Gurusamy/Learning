@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from routers.student import student_router
+from routers.auth import auth_router
 app = FastAPI()
 app.include_router(student_router)
-
+app.include_router(auth_router)
 
 
 
