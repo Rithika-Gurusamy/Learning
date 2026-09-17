@@ -1,4 +1,5 @@
 from pwdlib import PasswordHash
+from datetime import datetime, timedelta, timezone
 from jose import jwt
 
 SECRET_KEY = "your-super-secret-key"
@@ -15,4 +16,15 @@ def verify_password(password: str, hashed_password: str):
     return password_hash.verify(password, hashed_password)
 
 def create_access_token(data: dict):
-    return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    to_encode = data.copy()
+
+    expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+
+    to_encode.update({"exp": expire})
+    
+    return jwt.encode(
+        to_encode,
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+    
