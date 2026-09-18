@@ -2,7 +2,7 @@ from fastapi import APIRouter,HTTPException,Depends
 from models import User
 from database import get_db
 from sqlalchemy import select
-from schemas.user import UserCreate
+from schemas.user import UserCreate,Userlogin
 from sqlalchemy.orm import Session
 from security import hash_password,verify_password,create_access_token
 
@@ -31,7 +31,7 @@ def user_signup(user:UserCreate,db:Session = Depends(get_db)):
     }
     
 @auth_router.post("/login")
-def user_login(user:UserCreate,db:Session = Depends(get_db)):
+def user_login(user:Userlogin,db:Session = Depends(get_db)):
 
     n = user.username 
     stmt = select(User).where(User.username == n)

@@ -84,7 +84,7 @@ def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db)):
 def student_delete(roll : int , db:Session = Depends(get_db)):
         stmt = select(Student).where(Student.roll == roll)
         res = db.execute(stmt)
-        s = res.scalar_one_or_none()
+        s = res.scalars().one_or_none()
         if s == None:
             raise HTTPException(status_code=404 , detail = "student not found")
         else:
