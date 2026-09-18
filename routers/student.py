@@ -4,6 +4,9 @@ from models import Student
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from schemas.student import StudentCreate , StudentUpdate , Studentresponse
+from dependencies import get_current_user
+from models import User
+
 student_router = APIRouter(
     prefix="/students",
     tags=["Students"]
@@ -12,14 +15,15 @@ student_router = APIRouter(
 
 
 @student_router.post("")
-def create_student(student: StudentCreate,db:Session = Depends(get_db)):
+def create_student(student: StudentCreate,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
 
     
         db_student = Student(
             name=student.name,
             roll=student.roll,
             email=student.email,
-            age=student.age
+            age=student.age,
+            user_id = current_user.id
         )
 
         db.add(db_student)

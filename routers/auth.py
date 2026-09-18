@@ -5,7 +5,7 @@ from sqlalchemy import select
 from schemas.user import UserCreate,Userlogin
 from sqlalchemy.orm import Session
 from security import hash_password,verify_password,create_access_token
-
+from fastapi.security import OAuth2PasswordRequestForm
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -31,7 +31,7 @@ def user_signup(user:UserCreate,db:Session = Depends(get_db)):
     }
     
 @auth_router.post("/login")
-def user_login(user:Userlogin,db:Session = Depends(get_db)):
+def user_login(user:OAuth2PasswordRequestForm = Depends(),db:Session = Depends(get_db)):
 
     n = user.username 
     stmt = select(User).where(User.username == n)
@@ -42,7 +42,7 @@ def user_login(user:Userlogin,db:Session = Depends(get_db)):
     else:
         if verify_password(user.password,us.hashed_password):
             access_token = create_access_token({
-                "sub" : us.id 
+                "sub" : str(us.id)
             })
 
             return {
