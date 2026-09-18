@@ -28,11 +28,13 @@ def get_current_user(
                 detail="Invalid token"
             )
 
-    except JWTError:
+    except JWTError as e:
+        print("JWT ERROR:",e)
         raise HTTPException(
             status_code=401,
             detail="Invalid or expired token"
         )
+       
 
     stmt = select(User).where(User.id == int(user_id))
 
