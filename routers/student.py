@@ -47,16 +47,18 @@ def get_students(db:Session = Depends(get_db)):
         return students
 
 @student_router.get("/{roll}")
-def get_student_by_roll(roll : int,db:Session = Depends(get_db)):
+def get_student_by_roll(roll : int,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
 
         stmt = select(Student).where(Student.roll == roll)
-
         result = db.execute(stmt)
-
         st = result.scalar_one_or_none()
-        if st == None:
+        if st and st.user_id == current_user.id:
+            return st
+        elif st == None:
             raise HTTPException(status_code=404 , detail = "student not found")
-        return st
+        else:
+            raise HTTPException(status_code=403 , detail = "you are not authorized to access this student")
+       
 
 @student_router.get("/email/{email}")
 def get_student_by_email(email : str,db:Session = Depends(get_db)):
