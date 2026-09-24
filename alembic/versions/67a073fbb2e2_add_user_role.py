@@ -16,6 +16,8 @@ revision: str = '67a073fbb2e2'
 down_revision: Union[str, Sequence[str], None] = '44280c390d0d'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
+
+
 def upgrade() -> None:
     op.drop_table('ps')
 
