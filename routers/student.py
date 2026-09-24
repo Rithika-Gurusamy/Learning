@@ -42,23 +42,26 @@ def get_student_by_email(email : str,db:Session = Depends(get_db),current_user :
 
 @student_router.post("")
 def create_student(student: StudentCreate,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
-
-    
-        db_student = Student(
+        stmt = select(Student).where(Student.user_id == current_user.id)
+        res = db.execute(stmt)
+        if res.scalar_one_or_none():
+            raise HTTPException(status_code = 409 , detail = "student already exists")
+        else:
+            db_student = Student(
             name=student.name,
             roll=student.roll,
             email=student.email,
             age=student.age,
             user_id = current_user.id
-        )
+            )
 
-        db.add(db_student)
+            db.add(db_student)
 
-        db.commit()
+            db.commit()
 
-        return {
-            "message": "Student created successfully"
-        }
+            return {
+                "message": "Student created successfully"
+            }
 
 
 
