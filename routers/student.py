@@ -33,7 +33,7 @@ def get_student_by_email(email : str,db:Session = Depends(get_db),current_user :
         stmt = select(Student).where(Student.email == email)
         result = db.execute(stmt)
         st = result.scalars().all()
-        if st and st.user_id == current_user.id:
+        if st :
             return st
         elif len(st) <= 0:
             raise HTTPException(status_code=404 , detail = "student not found")
@@ -62,30 +62,30 @@ def create_student(student: StudentCreate,db:Session = Depends(get_db),current_u
 
 
 
-@student_router.get("/{roll}")
-def get_student_by_roll(roll : int,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
+@student_router.get("/me")
+def get_student(db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
 
-        stmt = select(Student).where(Student.roll == roll)
+        stmt = select(Student).where(Student.user_id == current_user.id)
         result = db.execute(stmt)
         st = result.scalar_one_or_none()
-        if st and st.user_id == current_user.id:
+        if st:
             return st
-        elif st == None:
+        elif st is None:
             raise HTTPException(status_code=404 , detail = "student not found")
         else:
             raise HTTPException(status_code=403 , detail = "you are not authorized to access this student")
        
 
 
-@student_router.patch("/{roll}",response_model = Studentresponse)
-def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
+@student_router.patch("/me",response_model = Studentresponse)
+def updatestudent( st : StudentUpdate,db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
         
-        stmt = select(Student).where(Student.roll == roll)
+        stmt = select(Student).where(Student.user_id == current_user.id)
         res = db.execute(stmt)
         s = res.scalar_one_or_none()
-        if s == None:
+        if s is None:
             raise HTTPException(status_code = 404 , detail = "student not found")
-        elif s.user_id == current_user.id:
+        elif s:
             updatedata = st.model_dump(exclude_unset = True)
             for key,value in updatedata.items():
                 setattr(s,key,value)
@@ -95,14 +95,14 @@ def updatestudent(roll : int ,st : StudentUpdate,db:Session = Depends(get_db),cu
         else:
             raise HTTPException(status_code=403 , detail = "you are not authorized to update this student")
 
-@student_router.delete("/{roll}")
-def student_delete(roll : int , db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
-        stmt = select(Student).where(Student.roll == roll)
+@student_router.delete("/me")
+def student_delete(db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
+        stmt = select(Student).where(Student.user_id == current_user.id)
         res = db.execute(stmt)
-        s = res.scalars().one_or_none()
-        if s == None:
+        s = res.scalar().one_or_none()
+        if s is None:
             raise HTTPException(status_code=404 , detail = "student not found")
-        elif s.user_id == current_user.id:
+        elif s:
             db.delete(s)
             db.commit()
             return {"message" : "Student deleted successfully"}
