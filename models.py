@@ -20,4 +20,5 @@ class User(Base):
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str] = mapped_column()
     hashed_password: Mapped[str] = mapped_column()
-
+    role : Mapped[str] = mapped_column()
+    
