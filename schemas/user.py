@@ -5,9 +5,9 @@ class UserCreate(BaseModel):
     email: str
     password: str
     role : str
+    
 
 class Userlogin(BaseModel):
     username : str
     password : str
     role : str
-    
