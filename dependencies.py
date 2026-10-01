@@ -8,11 +8,22 @@ from database import get_db
 from models import User
 from security import SECRET_KEY, ALGORITHM
 
+from fastapi.security import HTTPBearer
+
+security = HTTPBearer()
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def get_current_user(
+'''def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db)):
+
+'''
+
+def get_current_user(
+    credentials = Depends(security),
+    db: Session = Depends(get_db)
+):
 
     try:
         payload = jwt.decode(
