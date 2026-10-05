@@ -12,7 +12,7 @@ from fastapi.security import HTTPBearer
 
 security = HTTPBearer()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
 
 '''def get_current_user(
     token: str = Depends(oauth2_scheme),
@@ -24,7 +24,7 @@ def get_current_user(
     credentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-
+    token = credentials.credentials
     try:
         payload = jwt.decode(
             token,
