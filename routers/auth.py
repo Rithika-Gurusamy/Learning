@@ -14,22 +14,25 @@ auth_router = APIRouter(
 
 @auth_router.post("/signup")
 def user_signup(user:UserCreate,db:Session = Depends(get_db)):
-
-    hashed_password = hash_password(user.password)
-
-    new_user = User(
-
+    stmt = select(User).where(User.username == user.username)
+    res = db.execute(stmt)
+    ans = res.scalar_one_or_none()
+    if ans:
+        raise HTTPException(status_code=409 , detail = "user already exists")
+    else:
+        hashed_password = hash_password(user.password)
+        new_user = User(
         username = user.username,
         email = user.email,
         hashed_password = hashed_password,
         role = user.role
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return {
         "message": f"user {new_user.username} registered successfully"
-    }
+        }
     
 @auth_router.post("/login")
 def user_login(user:Userlogin,db:Session = Depends(get_db)):
