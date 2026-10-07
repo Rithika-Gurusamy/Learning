@@ -6,7 +6,7 @@ from schemas.user import UserCreate,Userlogin
 from sqlalchemy.orm import Session
 from security import hash_password,verify_password,create_access_token
 from fastapi.security import OAuth2PasswordRequestForm
-
+from dependencies import get_current_user
 auth_router = APIRouter(
     prefix="/auth",
     tags=["Auth"]
@@ -55,3 +55,17 @@ def user_login(user:Userlogin,db:Session = Depends(get_db)):
         else:
             raise HTTPException(status_code = 401 , detail = "invalid credentials")
         
+@auth_router.delete("/delete/me")
+def delete_user(db : Session = Depends(get_db),current_user : User = Depends(get_current_user)):
+
+        stmt = select(User).where(User.id == current_user.id)
+        res = db.execute(stmt)
+        us = res.scalar_one_or_none()
+        if us is None:
+            raise HTTPException(status_code = 404 , detail = "user not found")
+        else:
+            db.delete(us)
+            db.commit()
+            return {
+                "message" : "user deleted successfully"
+            }

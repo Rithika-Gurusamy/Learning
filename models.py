@@ -12,7 +12,7 @@ class Student(Base):
     roll: Mapped[int] = mapped_column()
     email: Mapped[str] = mapped_column()
     age: Mapped[int] = mapped_column()
-    user_id:Mapped[int] = mapped_column(ForeignKey("users.id"),unique=True)
+    user_id:Mapped[int] = mapped_column(ForeignKey("users.id",ondelete="CASCADE"),unique=True)
 
 class User(Base):
     __tablename__ = "users"

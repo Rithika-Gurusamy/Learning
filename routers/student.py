@@ -102,7 +102,7 @@ def updatestudent( st : StudentUpdate,db:Session = Depends(get_db),current_user 
 def student_delete(db:Session = Depends(get_db),current_user : User = Depends(get_current_user)):
         stmt = select(Student).where(Student.user_id == current_user.id)
         res = db.execute(stmt)
-        s = res.scalar().one_or_none()
+        s = res.scalar_one_or_none()
         if s is None:
             raise HTTPException(status_code=404 , detail = "student not found")
         elif s:
