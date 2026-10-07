@@ -41,10 +41,10 @@ def user_login(user:Userlogin,db:Session = Depends(get_db)):
     stmt = select(User).where(User.username == n)
     res = db.execute(stmt)
     us = res.scalar_one_or_none()
-    if us == None:
+    if us is None:
         raise HTTPException(status_code =404 , detail = "user not found")
     else:
-        if verify_password(user.password,us.hashed_password) and user.role == us.role:
+        if verify_password(user.password,us.hashed_password):
             access_token = create_access_token({
                 "sub" : str(us.id),
                 "role" : str(us.role)

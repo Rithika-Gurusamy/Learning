@@ -10,4 +10,4 @@ class UserCreate(BaseModel):
 class Userlogin(BaseModel):
     username : str
     password : str
-    role : str
+    
